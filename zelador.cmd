@@ -1,3 +1,2 @@
 @echo off
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0zelador.ps1" %*
-if "%~1"=="" pause
+start "" powershell -STA -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0zelador.ps1"

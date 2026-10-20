@@ -1,47 +1,39 @@
 # Zelador
 
-Análise e manutenção leve do Windows 10/11 num único script PowerShell. Não precisa instalar nada: usa o Windows PowerShell 5.1 que já vem no sistema.
+Painel de análise e manutenção do Windows 10/11, com interface própria e tema escuro. Não precisa instalar nada: é PowerShell 5.1 + WPF, que já vêm no Windows.
 
-Por padrão o Zelador **só lê** e mostra um relatório. As ações (limpar caches, desligar anúncios etc.) ficam num menu à parte, e cada uma pede confirmação.
+## Como abrir
 
-## O que ele verifica
+Clone ou baixe o repositório e dê dois cliques em **`zelador.cmd`**.
 
-| Área | O quê |
+Abrir como usuário comum já mostra tudo. Para mudar serviços e ajustes do sistema, use o botão **Reabrir como admin** na barra lateral.
+
+## Páginas
+
+| Página | O que tem |
 |---|---|
-| Sistema | Versão do Windows, hardware, tempo desde o último boot |
-| Discos | Espaço livre, saúde dos SSDs/HDs, TRIM |
-| Espaço | Caches conhecidos (Google Drive, npm, Gradle, pip, shaders, Docker, Android, Windows Update...), as 15 maiores pastas, Downloads |
-| Segurança | Defender (tempo real, assinaturas, varredura completa, histórico), firewall, UAC, arquivo hosts, proxy, Winlogon, IFEO, processos sem assinatura ou rodando de lugares estranhos |
-| Inicialização | Programas que abrem com o Windows (só os ativos), tarefas agendadas e serviços de terceiros |
-| Otimizações | Anúncios no Iniciar, Game DVR, Bing na busca, inicialização rápida, telemetria, apps pré-instalados comuns |
-| Atualizações | Apps com versão nova no `winget` |
+| **Painel** | Nota de saúde de 0 a 100, CPU e memória ao vivo, discos com saúde e espaço livre, pontos de atenção clicáveis |
+| **Armazenamento** | Caches e sobras conhecidos (lixeira, temporários, npm, pip, Gradle, shaders, Windows Update, Google Drive, Docker...) com botão Limpar, e um explorador que mede pastas e deixa descer de nível |
+| **Segurança** | Defender (tempo real, assinaturas, varreduras), firewall, UAC, histórico de ameaças, sinais de sequestro (Winlogon, IFEO, proxy), arquivo hosts, processos sem assinatura. Botões para varredura rápida/completa e atualizar assinaturas |
+| **Inicialização** | Liga/desliga os programas que abrem com o Windows (igual ao Gerenciador de Tarefas) e alterna serviços de terceiros entre Automático e Manual |
+| **Debloat** | Ajustes com interruptor: anúncios, Game DVR, Bing na busca, extensões de arquivo, aceleração do mouse, inicialização rápida, telemetria, Recall. Remove apps pré-instalados (os do Xbox ficam de fora) |
+| **Atualizações** | Lista do `winget upgrade`; marque e atualize com a saída ao vivo |
+| **Bateria** | Saúde (capacidade atual x de fábrica), ciclos, carga e autonomia, via `powercfg /batteryreport` |
+| **Registro de ações** | Tudo o que o Zelador mudou, com **Desfazer** para ajustes de registro e serviços |
 
-## Ações disponíveis (`-Acoes`)
+## Como funciona
 
-1. Limpar caches (npm, Gradle, pip, Yarn, shaders NVIDIA/DirectX, dumps, temporários)
-2. Desligar anúncios e sugestões no Iniciar
-3. Desligar a gravação em segundo plano do Game Bar (os apps do Xbox continuam instalados)
-4. Desligar o Bing na busca do Iniciar
-5. Desligar a inicialização rápida *(admin)*
-6. Atualizar todos os apps com `winget upgrade --all`
+- `zelador.ps1`: a janela e a lógica da interface.
+- `src/janela.xaml`: o layout e o tema.
+- `src/coleta.ps1`: leitura do sistema (nada aqui altera nada).
+- `src/acoes.ps1`: o que altera o sistema. Cada mudança guarda o valor anterior em `%LOCALAPPDATA%\Zelador\registro.json`, e é isso que permite desfazer.
 
-## Como usar
-
-Clone ou baixe o repositório e dê dois cliques em `zelador.cmd`, ou rode no terminal:
-
-```powershell
-.\zelador.cmd                          # só análise
-.\zelador.cmd -Acoes                   # análise + menu de ações
-.\zelador.cmd -Profundo                # inclui arquivos > 1 GB no C: (demora)
-.\zelador.cmd -Html relatorio.html     # salva o relatório em HTML
-```
-
-Rodar como administrador libera mais verificações e as ações marcadas com *(admin)*.
+O trabalho pesado (medir pastas, winget, Defender) roda em segundo plano para a janela não travar.
 
 ## Avisos
 
-- As ações mexem no registro do usuário e, como admin, em algumas políticas do sistema. Leia o script antes de rodar: ele é curto de propósito.
-- "Atenção" no relatório é um sinal para olhar, não uma prova de problema.
+- Limpezas e remoção de apps não têm desfazer. O app sempre pergunta antes.
+- Um ponto de atenção é um sinal para olhar, não prova de problema. Muito software livre não tem assinatura digital, por exemplo.
 
 ## Licença
 
